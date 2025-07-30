@@ -9,11 +9,13 @@ export class UsersService {
             id: 1,
             username: 'dan',
             password: '1234',
+            role: 'commander',
         },
         {
             id: 2,
             username: 'meni',
             password: '5555',
+            role: 'soldier',
         },
     ];
 
@@ -22,6 +24,7 @@ export class UsersService {
             id: user.id,
             username: user.username,
             password: user.password,
+            role: user.role,
         };
         this.users.push(newUser);
         return newUser;
