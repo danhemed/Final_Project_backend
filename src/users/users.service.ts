@@ -1,53 +1,35 @@
 import { Injectable } from '@nestjs/common';
-
-export type User = any;
+import { DbService } from 'src/db/db.service';
+import { User } from './user.model';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-    private users = [
-        {
-            id: 1,
-            username: 'dan',
-            password: '1234',
-            role: 'commander',
-        },
-        {
-            id: 2,
-            username: 'meni',
-            password: '5555',
-            role: 'soldier',
-        },
-    ];
+  constructor(private readonly dbService: DbService) {
+    User.initialize(this.dbService.getSequelize());
+  }
 
-    async create(user: any): Promise<User | undefined> {
-        const newUser = {
-            id: user.id,
-            username: user.username,
-            password: user.password,
-            role: user.role,
-        };
-        this.users.push(newUser);
-        return newUser;
-    }
+  async create(dto: CreateUserDto): Promise<User> {
+    return await User.create({...dto});
+  }
 
-    async findAll(): Promise<User | undefined> {
-        return this.users;
-    }
+  async findAll(): Promise<User[]> {
+    return await User.findAll();
+  }
 
-    async findOne(username: string): Promise<User | undefined> {
-        return this.users.find(user => user.username === username);
-    }
+  async findOne(id: number): Promise<User | null> {
+    return await User.findByPk(id);
+  }
 
-    async update(username: string, updateUser: any): Promise<User | undefined> {
-        const user = this.findOne(username);
-        if (user) {
-            Object.assign(user, updateUser);
-        }
-        return user;
-    }
+  async update(id: number, updateDto: UpdateUserDto): Promise<User | null> {
+    const user = await User.findByPk(id);
+    if (!user) return null;
+    return await user.update(updateDto);
+  }
 
-    async delete(username: string): Promise<User | undefined> {
-        this.users = this.users.filter(user => user.username !== username);
-        return { deleted: true };
-    }
+  async delete(id: number): Promise<boolean> {
+    const deleted = await User.destroy({ where: { id } });
+    return deleted > 0;
+  }
 }

@@ -8,6 +8,12 @@ export class DbService implements OnModuleInit, OnModuleDestroy {
     constructor() {
         this.sequelize = new Sequelize(process.env.POSTGRES_CONNECTION || "", {
             dialect: 'postgres',
+            dialectOptions: {
+                ssl: {
+                    require: true,
+                    rejectUnauthorized: false,
+                },
+            },
             pool: {
                 max: 20,
                 min: 0,
@@ -20,7 +26,7 @@ export class DbService implements OnModuleInit, OnModuleDestroy {
     async onModuleInit() {
         try {
             await this.sequelize.authenticate();
-            console.log('Database connected successfully'); 
+            console.log('Database connected successfully');
         } catch (error) {
             console.error('Database connection failed:', error);
             throw error;
@@ -35,13 +41,13 @@ export class DbService implements OnModuleInit, OnModuleDestroy {
         return this.sequelize;
     }
 
-    async syncDatabase(force: boolean = false) {
-        try {
-            await this.sequelize.sync({ force });
-            console.log('Database synced successfully');
-        } catch (error) {
-            console.error('Database sync failed:', error);
-            throw error;
-        }
-    }
+    // async syncDatabase(force: boolean = false) {
+    //     try {
+    //         await this.sequelize.sync({ force });
+    //         console.log('Database synced successfully');
+    //     } catch (error) {
+    //         console.error('Database sync failed:', error);
+    //         throw error;
+    //     }
+    // }
 }
